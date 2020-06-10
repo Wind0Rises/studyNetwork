@@ -1,4 +1,4 @@
-package com.liu.study.network.server;
+package com.liu.study.network.basis.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -39,7 +39,7 @@ public class Server implements Runnable{
 			this.selector = Selector.open();
 			
 			// 02、 打开serverSocket通道。每一个ServerSocketChannel都一个与之对应的
-			//     ServerSocket,通过其socket()方法获取。
+			//      ServerSocket,通过其socket()方法获取。
 			ServerSocketChannel channel = ServerSocketChannel.open();
 			
 			// 03、 设置模式,设置为非堵塞。
@@ -48,18 +48,20 @@ public class Server implements Runnable{
 			// 04、 绑定地址。注意与channel.socket().bind(new InetSocketAddress(8080));
 			channel.bind(new InetSocketAddress(port));
 			
-			// 05、 把Selector注册到ServerSocketChannel【服务端通道】
-			//     OP_ACCEPT: 代表接受请求操作
-			//	   OP_CONNECT:代表连接操作
-			//     OP_READ  : 代表读操作
-			//     OP_WRITE : 代表写操作
-			SelectionKey selectionKey = channel.register(this.selector, SelectionKey.OP_ACCEPT);
+			// 05、 把ServerSocketChannel注册到Selector【服务端通道】
+			//     OP_ACCEPT: 代表接受请求操作			16
+			//	   OP_CONNECT:代表连接操作				8
+			//     OP_READ  : 代表读操作					1
+			//     OP_WRITE : 代表写操作					4
+			channel.register(this.selector, SelectionKey.OP_ACCEPT);
 			
 			System.out.println("【服务已启动】,监听端口为：" + port);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
+
 
     /**
      * 
@@ -69,28 +71,42 @@ public class Server implements Runnable{
 		while(true) {
 			try {
 				// 01、 启动多路复用器的监听模式
-				int selectInt = this.selector.select();
+				// select()：方法会堵塞，知道至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
+
+				// 		准备好的channel才会去调用。
+				this.selector.select();
+				System.out.println(selector.keys());
 				
-				// 02、 获取多路复用器中的SelectionKey。每次向Seletor注册时都会创建一个SelectKey
+				// 02、 获取多路复用器中的SelectionKey。每次向Selector注册时都会创建一个SelectKey。
+				//      这个时候获取到的就是准备好的Channel。
+
 				Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
-				
-				// 03、 获取
+
+				// 03、 遍历所有准备好的Channel，并根据对应的Key，选择不同的处理方式。
 				while(keys.hasNext()) {
 					SelectionKey key = keys.next();
-					
 					keys.remove();
+					System.out.println(key.toString());
 					
 					if(key.isValid()) {
+						/**
+						 * ################################################
+						 * # accept(..)、reader(..)、writer(..)不是异步的   #
+						 * ################################################
+						 */
 						if(key.isAcceptable()) {
+							System.out.println("============Accept===============");
 							this.accept(key);
 						}
 						
 						if(key.isReadable()) {
+							System.out.println("============Read===============");
 							this.reader(key);
 						}
 						
 						if(key.isWritable()) {
-							this.wirter(key);
+							System.out.println("============Write===============");
+							this.writer(key);
 						}
 					}
 					
@@ -101,13 +117,18 @@ public class Server implements Runnable{
 			}
 		}
 	}
-	
+
+
+	/**
+	 * 把OP_ACCEPT对应的Channel改为OP_READ然后注册到Selector中。
+	 */
 	public void accept(SelectionKey key) {
 		try {
-			// 01、 获取ServerSocketChannel
+			// 01、 获取ServerSocketChannel。返回创建key对应的通道。
 			ServerSocketChannel channel = (ServerSocketChannel) key.channel();
 
-			// 02、 获取SocketChannel
+			// 02、 获取SocketChannel。
+			//		接受与此通道的套接字建立的连接。这是一个新的Channel。【很重要】
 			SocketChannel socketChannel = channel.accept();
 			
 			// 03、 设置为非堵塞模式
@@ -151,7 +172,7 @@ public class Server implements Runnable{
 	}
 	
 	
-	public void wirter(SelectionKey key) {
+	public void writer(SelectionKey key) {
 		
 	}
 	

@@ -1,4 +1,4 @@
-package com.liu.study.network.server;
+package com.liu.study.network.basis.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;

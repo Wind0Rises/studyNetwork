@@ -1,4 +1,4 @@
-package com.liu.study.network.client;
+package com.liu.study.network.basis.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,7 +10,7 @@ import java.nio.channels.SocketChannel;
  * @author Liuweian
  * @createTime 2019年2月22日 下午4:48:45
  */
-public class Client {
+public class SecondClient {
 	
 	public static void main(String[] args) {
 		// 1、设置连接地址

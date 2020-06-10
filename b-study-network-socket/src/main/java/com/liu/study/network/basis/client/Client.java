@@ -1,4 +1,4 @@
-package com.liu.study.network.client;
+package com.liu.study.network.basis.client;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
