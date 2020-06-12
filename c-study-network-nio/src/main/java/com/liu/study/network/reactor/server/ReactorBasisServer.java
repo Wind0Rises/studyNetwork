@@ -68,7 +68,7 @@ public class ReactorBasisServer {
         while(true) {
             try {
                 // 01、 启动多路复用器的监听模式
-                // select()：方法会堵塞，知道至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
+                // select()：方法会堵塞，直到至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
 
                 // 		准备好的channel才会去调用。
                 this.selector.select();
