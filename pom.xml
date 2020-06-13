@@ -24,7 +24,8 @@
     <modules>
         <module>a-study-network-common</module>
         <module>b-study-network-socket</module>
-        <module>c-study-network-nio</module>
+        <module>c-study-network-io</module>
+        <module>d-study-network-nio</module>
     </modules>
 
     <build>
