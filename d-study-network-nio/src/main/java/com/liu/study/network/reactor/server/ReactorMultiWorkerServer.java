@@ -58,13 +58,15 @@ public class ReactorMultiWorkerServer {
             channel.bind(new InetSocketAddress(port));
 
             // 05、 把ServerSocketChannel注册到Selector【服务端通道】
-            //     OP_ACCEPT: 代表接受请求操作			16
+            //     OP_ACCEPT: 代表接受请求操作			    16
             //	   OP_CONNECT:代表连接操作				8
             //     OP_READ  : 代表读操作					1
             //     OP_WRITE : 代表写操作					4
             channel.register(this.selector, SelectionKey.OP_ACCEPT, new Acceptor(selector, channel));
 
-
+            /**
+             * 创建多个请求处理器。
+             */
             DispatchHandler[] handlers = new DispatchHandler[20];
             for (DispatchHandler handler : handlers){
                 handler = new DispatchHandler();
@@ -82,7 +84,6 @@ public class ReactorMultiWorkerServer {
      *
      */
     public void run() {
-
         int count = 0;
 
         // 无限循环，处理注册到多路复用器中的“client channel”
@@ -90,15 +91,14 @@ public class ReactorMultiWorkerServer {
             try {
                 // 01、 启动多路复用器的监听模式
                 // select()：方法会堵塞，知道至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
-
-                // 		准备好的channel才会去调用。
                 this.selector.select();
                 System.out.println(selector.keys());
 
+
                 // 02、 获取多路复用器中的SelectionKey。每次向Selector注册时都会创建一个SelectKey。
                 //      这个时候获取到的就是准备好的Channel。
-
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
+
 
                 // 03、 遍历所有准备好的Channel，并根据对应的Key，选择不同的处理方式。
                 while(keys.hasNext()) {
@@ -111,9 +111,7 @@ public class ReactorMultiWorkerServer {
                         handlers[count ++ % 20].addChannel(socketChannel);
                     }
                     keys.remove();
-
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -123,8 +121,7 @@ public class ReactorMultiWorkerServer {
 
 
     static class DispatchHandler{
-        private static Executor executor = new ThreadPoolExecutor(10, 20,
-                10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
+        private static Executor executor = new ThreadPoolExecutor(10, 20, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
 
         private Selector selector;
 
@@ -145,8 +142,6 @@ public class ReactorMultiWorkerServer {
                     try {
                         // 01、 启动多路复用器的监听模式
                         // select()：方法会堵塞，知道至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
-
-                        // 		准备好的channel才会去调用。
                         this.selector.select();
                         System.out.println(selector.keys());
 
@@ -216,8 +211,7 @@ public class ReactorMultiWorkerServer {
 
 
 
-    private static Executor executors = new ThreadPoolExecutor(10, 20,
-            10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
+    private static Executor executors = new ThreadPoolExecutor(10, 20, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10));
     /**
      * 读处理操作。
      */

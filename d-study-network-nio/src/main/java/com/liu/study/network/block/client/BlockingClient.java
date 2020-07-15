@@ -1,6 +1,5 @@
 package com.liu.study.network.block.client;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -9,9 +8,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 /**
+ * @desc
+ *
+ *
  * @author Liuweian
  * @version 1.0.0
- * @desc
  * @createTime 2020/6/10 13:49
  */
 public class BlockingClient {

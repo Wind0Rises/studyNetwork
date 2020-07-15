@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
+ * 服务处理请求，处理器。
  *
  */
 public class ServerHandler implements Runnable {
@@ -24,14 +25,14 @@ public class ServerHandler implements Runnable {
 		try {
 			reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 			writer = new PrintWriter(this.socket.getOutputStream(), true);
-			StringBuilder request = new StringBuilder();
 			
-			String body = null;
+			String body;
+
 			while(true){
 				body = reader.readLine();
 				if(body == null) break;
 				System.out.println("【服务端】获取的内容: " + body);
-				writer.println("Server response");
+				writer.println("Server response：请求完成。");
 			}
 			
 		} catch (IOException e) {

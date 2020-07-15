@@ -3,10 +3,7 @@ package com.liu.study.network.basis.server;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Iterator;
 
 /**
@@ -20,11 +17,11 @@ public class Server implements Runnable{
      *  1、 多路复用器（管理所有通道的）
      */
 	private Selector selector;
-	
-	private ByteBuffer readBuffer = ByteBuffer.allocate(1024);
-	
-	// private ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
 
+	/**
+	 * 读取的文
+	 */
+	private ByteBuffer readBuffer = ByteBuffer.allocate(1024);
 
     public static void main(String[] args) {
         new Thread(new Server(8093)).start();
@@ -35,7 +32,7 @@ public class Server implements Runnable{
      */
 	public Server(int port) {
 		try {
-			// 01、 创建一个Selector实例。打开多路复用器
+			// 01、 创建一个Selector实例。打开多路复用器。可以管理多个Channel。
 			this.selector = Selector.open();
 			
 			// 02、 打开serverSocket通道。每一个ServerSocketChannel都一个与之对应的
@@ -49,7 +46,7 @@ public class Server implements Runnable{
 			channel.bind(new InetSocketAddress(port));
 			
 			// 05、 把ServerSocketChannel注册到Selector【服务端通道】
-			//     OP_ACCEPT: 代表接受请求操作			16
+			//     OP_ACCEPT: 代表接受请求操作			   16
 			//	   OP_CONNECT:代表连接操作				8
 			//     OP_READ  : 代表读操作					1
 			//     OP_WRITE : 代表写操作					4
@@ -70,16 +67,14 @@ public class Server implements Runnable{
 		// 无限循环，处理注册到多路复用器中的“client channel”
 		while(true) {
 			try {
-				// 01、 启动多路复用器的监听模式
-				// select()：方法会堵塞，知道至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
-
-				// 		准备好的channel才会去调用。
+				// 01、 启动多路复用器的监听模式，准备好的channel才会去调用。
+				// 			select()：方法会堵塞，直到至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。否则将一直堵塞下去。
+				//   		SelectKey：表示SelectableChannel向Selector的注册的令牌。可以通过SelectKey获取Channel和Selector。
 				this.selector.select();
-				System.out.println(selector.keys());
+				System.out.println("Selector中已经准备好" + selector.keys());
 				
 				// 02、 获取多路复用器中的SelectionKey。每次向Selector注册时都会创建一个SelectKey。
 				//      这个时候获取到的就是准备好的Channel。
-
 				Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
 
 				// 03、 遍历所有准备好的Channel，并根据对应的Key，选择不同的处理方式。
@@ -140,13 +135,18 @@ public class Server implements Runnable{
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 *
+	 *
+	 * @param key
+	 */
 	public void reader(SelectionKey key) {
 		try {
 			// 1、 获取Socket通道
 			SocketChannel socketChannel = (SocketChannel) key.channel();
 			
-			// 2、 请求read缓存
+			// 2、 从【socketChannel】中请求read缓存
 			this.readBuffer.clear();
 			
 			// 3、 读取socket
@@ -164,7 +164,9 @@ public class Server implements Runnable{
 			
 			this.readBuffer.get(bytes);
 			String request = new String(bytes).trim();
-			
+
+
+			// socketChannel.register(this.selector, SelectionKey.OP_WRITE);
 			System.out.println("请求数据为：" + request);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -173,7 +175,24 @@ public class Server implements Runnable{
 	
 	
 	public void writer(SelectionKey key) {
-		
+		// 1、 获取Socket通道
+		SocketChannel socketChannel = (SocketChannel) key.channel();
+
+		String message = "this is server return";
+		ByteBuffer byteBuffer = ByteBuffer.allocate(message.getBytes().length);
+		byteBuffer.put(message.getBytes());
+
+		try {
+			socketChannel.write(byteBuffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
+		} catch (ClosedChannelException e) {
+			e.printStackTrace();
+		}
 	}
 	
 

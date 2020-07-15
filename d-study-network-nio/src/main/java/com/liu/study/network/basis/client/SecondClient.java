@@ -13,8 +13,6 @@ import java.nio.channels.SocketChannel;
 public class SecondClient {
 	
 	public static void main(String[] args) {
-		// 1、设置连接地址
-		InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8093);
 		
 		SocketChannel channel = null;
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -24,7 +22,7 @@ public class SecondClient {
 			channel = SocketChannel.open();
 			
 			// 3、进行连接
-			channel.connect(address);
+			channel.connect(new InetSocketAddress("127.0.0.1", 8093));
 			
 			while(true){
 				// 4、定义一个字节数组，然后使用系统录入功能：
@@ -39,6 +37,10 @@ public class SecondClient {
 				channel.write(buffer);
 				// 8、清空缓冲区数据
 				buffer.clear();
+
+				ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+				channel.read(readBuffer);
+				System.out.println(readBuffer.toString());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

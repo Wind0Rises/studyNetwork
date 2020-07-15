@@ -24,6 +24,9 @@ public class ReactorBasisServer {
     private Selector selector;
 
     public static void main(String[] args) {
+        /**
+         * 启动了
+         */
         new Thread(new Server(8093)).start();
     }
 
@@ -46,7 +49,7 @@ public class ReactorBasisServer {
             channel.bind(new InetSocketAddress(port));
 
             // 05、 把ServerSocketChannel注册到Selector【服务端通道】
-            //     OP_ACCEPT: 代表接受请求操作			16
+            //     OP_ACCEPT: 代表接受请求操作			    16
             //	   OP_CONNECT:代表连接操作				8
             //     OP_READ  : 代表读操作					1
             //     OP_WRITE : 代表写操作					4
@@ -68,16 +71,15 @@ public class ReactorBasisServer {
         while(true) {
             try {
                 // 01、 启动多路复用器的监听模式
-                // select()：方法会堵塞，直到至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
-
-                // 		准备好的channel才会去调用。
+                //      select()：方法会堵塞，直到至少有一个准备好的channel。如果有至少有一个准备好的channel，将可以往下执行。
                 this.selector.select();
                 System.out.println(selector.keys());
 
+
                 // 02、 获取多路复用器中的SelectionKey。每次向Selector注册时都会创建一个SelectKey。
                 //      这个时候获取到的就是准备好的Channel。
-
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
+
 
                 // 03、 遍历所有准备好的Channel，并根据对应的Key，选择不同的处理方式。
                 while(keys.hasNext()) {
@@ -101,6 +103,9 @@ public class ReactorBasisServer {
         }
     }
 
+    /**
+     *
+     */
     static class Acceptor implements Runnable {
 
         private Selector selector;

@@ -17,12 +17,15 @@ public class Server {
 	 * 程序入口类
 	 */
 	public static void main(String[] args) {
+
 		ServerSocket serverSocket = null;
+
 		try {
 			// 01、 创建服务端Socket,与Socket类似。
 			serverSocket = new ServerSocket(PORT);
+
 			HandlerExecutorPool executorPool = new HandlerExecutorPool(50, 1000);
-			Socket socket = null;
+
 			System.out.println("【服务端】启动成功，监听端口为：" + PORT);
 			
 			// 02、 循环获取请求。
@@ -32,7 +35,7 @@ public class Server {
 				//		当堵塞的时候CPU是可以去做其他的事情；开启多线程，就可以让CPU去处理更多的事情。所有使用多线程的本质：利用多核。当I/O
 				//		阻塞系统，但CPU空闲的时候，可以利用多线程使用CPU资源。
 				// 		InputStream.read()和
-				socket = serverSocket.accept();
+				Socket socket = serverSocket.accept();
 
 
 				/**
