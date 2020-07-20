@@ -26,6 +26,8 @@
         <module>b-study-network-socket</module>
         <module>c-study-network-io</module>
         <module>d-study-network-nio</module>
+        <module>e-study-network-aio</module>
+        <module>f-study-network-http</module>
     </modules>
 
     <build>

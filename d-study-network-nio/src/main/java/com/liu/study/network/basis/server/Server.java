@@ -166,33 +166,58 @@ public class Server implements Runnable{
 			String request = new String(bytes).trim();
 
 
-			// socketChannel.register(this.selector, SelectionKey.OP_WRITE);
+			socketChannel.register(this.selector, SelectionKey.OP_WRITE);
 			System.out.println("请求数据为：" + request);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+
+	private ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
 	
 	public void writer(SelectionKey key) {
-		// 1、 获取Socket通道
-		SocketChannel socketChannel = (SocketChannel) key.channel();
 
-		String message = "this is server return";
-		ByteBuffer byteBuffer = ByteBuffer.allocate(message.getBytes().length);
-		byteBuffer.put(message.getBytes());
-
+		SocketChannel sc = (SocketChannel)key.channel();
 		try {
-			socketChannel.write(byteBuffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//            sc.register(this.selector, SelectionKey.OP_WRITE);
+			System.out.println("来了没有？？？？？？？？？？？？？？？？");
+			byte[] bytes = "呵呵".getBytes();
+			writeBuffer.put(bytes);
+			writeBuffer.flip();
+			sc.write(writeBuffer);
+			writeBuffer.clear();
+			key.channel().close();
+			key.cancel();
+//            sc.register(this.selector, SelectionKey.OP_READ);
 
-		try {
-			socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
 		} catch (ClosedChannelException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+
 		}
+
+		/*// 1、 获取Socket通道
+		SocketChannel socketChannel = (SocketChannel) key.channel();
+		*//*String message = "this is server return";
+		ByteBuffer byteBuffer = ByteBuffer.allocate(message.getBytes().length);
+		byteBuffer.put(message.getBytes());*//*
+
+
+		try {
+			String content = (String) key.attachment();
+			System.out.println("=================================================返回数据=================================================");
+			socketChannel.write(ByteBuffer.wrap(("输出：" + content).getBytes()));
+			// socketChannel.write(byteBuffer);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				socketChannel.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}*/
 	}
 	
 

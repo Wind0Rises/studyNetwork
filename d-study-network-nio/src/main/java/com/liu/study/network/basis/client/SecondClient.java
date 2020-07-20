@@ -11,6 +11,26 @@ import java.nio.channels.SocketChannel;
  * @createTime 2019年2月22日 下午4:48:45
  */
 public class SecondClient {
+
+	public SecondClient() {
+		InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8093);
+
+		try {
+			SocketChannel channel = SocketChannel.open();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+
+
+
+
+
 	
 	public static void main(String[] args) {
 		
